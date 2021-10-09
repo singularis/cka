@@ -30,5 +30,7 @@ mkdir -p /etc/systemd/system/docker.service.d
 systemctl daemon-reload
 systemctl restart docker
 systemctl enable docker
+sudo groupadd docker
+sudo usermod -aG docker vagrant
 
 systemctl disable --now firewalld
