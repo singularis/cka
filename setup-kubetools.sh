@@ -19,7 +19,7 @@ OSVERSION=$(hostnamectl | awk '/Operating/ { print $4 }')
 if [ $MYOS = "CentOS" ]
 then
 	echo RUNNING CENTOS CONFIG
-	./home/vagrant/ckaeof.sh
+	./home/vagrant/cka/eof.sh
 	# Set SELinux in permissive mode (effectively disabling it)
 	sudo setenforce 0
 	sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
