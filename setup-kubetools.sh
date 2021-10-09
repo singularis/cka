@@ -19,7 +19,7 @@ OSVERSION=$(hostnamectl | awk '/Operating/ { print $4 }')
 if [ $MYOS = "CentOS" ]
 then
 	echo RUNNING CENTOS CONFIG
-	./eof.sh
+	./home/vagrant/ckaeof.sh
 	# Set SELinux in permissive mode (effectively disabling it)
 	sudo setenforce 0
 	sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
@@ -33,26 +33,6 @@ then
 	sudo systemctl enable --now kubelet
 fi
 
-if [ $MYOS = "Ubuntu" ]
-then
-	echo RUNNING UBUNTU CONFIG
-	cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
-	br_netfilter
-EOF
-	
-	sudo apt-get update && sudo apt-get install -y apt-transport-https curl
-	curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-	cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-	deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
-
-	sudo apt-get update
-	sudo apt-get install -y kubelet kubeadm kubectl
-	sudo apt-mark hold kubelet kubeadm kubectl
-	swapoff /swapfile
-	
-	sed -i 's/swapfile/#swapfile/' /etc/fstab
-fi
 
 # Set iptables bridging
 cat <<EOF >  /etc/sysctl.d/k8s.conf
