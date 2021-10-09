@@ -19,18 +19,13 @@ OSVERSION=$(hostnamectl | awk '/Operating/ { print $4 }')
 if [ $MYOS = "CentOS" ]
 then
 	echo RUNNING CENTOS CONFIG
-	sudo sh /home/vagrant/cka/eof.sh
+	chmod +x /home/vagrant/cka/kubead.sh
+	sudo  /home/vagrant/cka/kubead.sh
 	# Set SELinux in permissive mode (effectively disabling it)
-	sudo setenforce 0
-	sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
 	# disable swap (assuming that the name is /dev/centos/swap
 	sed -i 's/^\/dev\/mapper\/centos-swap/#\/dev\/mapper\/centos-swap/' /etc/fstab
 	swapoff /dev/mapper/centos-swap
-
-	sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-
-	sudo systemctl enable --now kubelet
 fi
 
 
