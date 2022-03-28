@@ -19,7 +19,7 @@ OSVERSION=$(hostnamectl | awk '/Operating/ { print $4 }')
 if [ $MYOS = "CentOS" ]
 then
 	echo RUNNING CENTOS CONFIG
-	cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
@@ -30,38 +30,13 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 exclude=kubelet kubeadm kubectl
 EOF
 
-	# Set SELinux in permissive mode (effectively disabling it)
-	setenforce 0
-	sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+# Set SELinux in permissive mode (effectively disabling it)
+sudo setenforce 0
+sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
-	# disable swap (assuming that the name is /dev/centos/swap
-	sed -i 's/^\/dev\/mapper\/centos-swap/#\/dev\/mapper\/centos-swap/' /etc/fstab
-	swapoff /dev/mapper/centos-swap
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 
-	yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-
-	systemctl enable --now kubelet
-fi
-
-if [ $MYOS = "Ubuntu" ]
-then
-	echo RUNNING UBUNTU CONFIG
-	cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
-	br_netfilter
-EOF
-	
-	sudo apt-get update && sudo apt-get install -y apt-transport-https curl
-	curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-	cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-	deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
-
-	sudo apt-get update
-	sudo apt-get install -y kubelet kubeadm kubectl
-	sudo apt-mark hold kubelet kubeadm kubectl
-	swapoff /swapfile
-	
-	sed -i 's/swapfile/#swapfile/' /etc/fstab
+sudo systemctl enable --now kubelet
 fi
 
 # Set iptables bridging
