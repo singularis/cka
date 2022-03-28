@@ -16,9 +16,7 @@ MYOS=$(hostnamectl | awk '/Operating/ { print $3 }')
 OSVERSION=$(hostnamectl | awk '/Operating/ { print $4 }')
 
 ##### CentOS 7 config
-if [ $MYOS = "CentOS" ]
-then
-	echo RUNNING CENTOS CONFIG
+echo RUNNING CENTOS CONFIG
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
@@ -37,7 +35,6 @@ sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 
 sudo systemctl enable --now kubelet
-fi
 
 # Set iptables bridging
 cat <<EOF >  /etc/sysctl.d/k8s.conf
